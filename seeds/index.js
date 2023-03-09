@@ -1,5 +1,5 @@
-// const output = require('./output');//Indian cities and state names
-const cities = require('./cities'); //Us city and state names
+const output = require('./output');//Indian cities and state names
+// const cities = require('./cities'); //Us city and state names
 const {places, descriptors} = require('./seedHelpers');
 const Campground = require('../models/campground');
 
@@ -22,8 +22,8 @@ const seedDB = async () => {
         const random1000 = Math.floor(Math.random()*400);
         // console.log(output[random1000]);
         const camp = new Campground({
-            // location: `${output[random1000].city}, ${output[random1000].admin_name}`,
-            location: `${cities[random1000].city}, ${cities[random1000].state}`,
+            location: `${output[random1000].city}, ${output[random1000].admin_name}`,
+            // location: `${cities[random1000].city}, ${cities[random1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`
         })
         await camp.save();
