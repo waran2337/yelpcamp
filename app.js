@@ -3,12 +3,14 @@ const path = require('path');
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
+const engine = require('ejs-mate')
 
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'))
+app.engine('ejs', engine)
 
 // <------------Mongoose Connection Code ---------------->
 const mongoose = require('mongoose');
@@ -63,10 +65,7 @@ app.delete('/campgrounds/:id', async (req, res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds')
-
 })
-
-
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
