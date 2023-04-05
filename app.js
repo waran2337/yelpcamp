@@ -5,6 +5,8 @@ const methodOverride = require('method-override')
 const engine = require('ejs-mate')
 const session = require('express-session')
 const flash = require('connect-flash')
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
 
 // <------------Requiring ERROR Functions Paths ---------------->
 const ExpressError = require('./utils/ExpressError')
@@ -12,12 +14,14 @@ const catchAsync = require('./utils/catchAsync')
 // <------------Requiring MODEL and SCHEMA Paths ---------------->
 const Campground = require('./models/campground')
 const Review = require('./models/review')
+const User = require('./models/user')
 const Joi = require('joi')
 const {campgroundSchema, reviewSchema } = require('./schemas')
 
 // <------------Requiring Router Paths ---------------->
-const campgrounds = require('./routes/campgrounds')
-const reviews = require('./routes/reviews')
+const campgroundRoutes = require('./routes/campgrounds')
+const reviewRoutes = require('./routes/reviews')
+const userRoutes = require('./routes/users')
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -39,10 +43,19 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig))
 app.use(flash());
+// <------------Passport Session ---------------->
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
+// <-------------------------------------------------->
 app.use((req, res, next) => {
+    console.log(req.session.returnTo)
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
+    res.locals.currentUser = req.user;
     next();
 })
 
@@ -59,21 +72,17 @@ async function main() {
 // <------------------------JOI DATA VALIDATION----------------------------->
 
 // <---------------------------------------------------------------------------->
-app.use('/campgrounds', campgrounds)
-
-app.use('/campgrounds/:id/reviews' , reviews)
+app.use('/campgrounds', campgroundRoutes)
+app.use('/campgrounds/:id/reviews' , reviewRoutes)
+app.use('/', userRoutes)
 
 
 app.get('/', (req, res) => {
     res.render('home')
 })
 
-
-
-
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404))
-
 })
 
 // <------------------------CUSTOM ERROR HANDLER----------------------------->
