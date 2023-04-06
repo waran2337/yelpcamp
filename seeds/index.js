@@ -25,7 +25,13 @@ const seedDB = async () => {
         const camp = new Campground({
             location: `${output[random1000].city}, ${output[random1000].admin_name}`,
             // location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            title: `${sample(descriptors)} ${sample(places)}`
+            title: `${sample(descriptors)} ${sample(places)}`,
+            image: 'https://source.unsplash.com/collection/483251',
+            description: 'It is a long established fact that a reader will be distracted by the readable ' +
+                'content of a page when looking at its layout. The point of using Lorem ' +
+                'Ipsum is that it has a more-or-less normal distribution of letters,',
+            price: random1000,
+            author: '6428707e65b845f2471e6308'
         })
         await camp.save();
     }
