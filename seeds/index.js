@@ -26,12 +26,21 @@ const seedDB = async () => {
             location: `${output[random1000].city}, ${output[random1000].admin_name}`,
             // location: `${cities[random1000].city}, ${cities[random1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
-            image: 'https://source.unsplash.com/collection/483251',
             description: 'It is a long established fact that a reader will be distracted by the readable ' +
                 'content of a page when looking at its layout. The point of using Lorem ' +
                 'Ipsum is that it has a more-or-less normal distribution of letters,',
             price: random1000,
-            author: '6428707e65b845f2471e6308'
+            author: '6428707e65b845f2471e6308',
+            images: [
+                {
+                    url: 'https://res.cloudinary.com/dyquncffs/image/upload/v1680959192/YelpCamp/ydzbimrdb4pbquk1gwah.png',
+                    filename: 'YelpCamp/ydzbimrdb4pbquk1gwah',
+                },
+                {
+                    url: 'https://res.cloudinary.com/dyquncffs/image/upload/v1680959192/YelpCamp/sl9nz63hif4lwtgzfqr6.png',
+                    filename: 'YelpCamp/sl9nz63hif4lwtgzfqr6',
+                }
+            ]
         })
         await camp.save();
     }
@@ -40,3 +49,5 @@ const seedDB = async () => {
 seedDB().then(() => {
     mongoose.connection.close();
 });
+
+
