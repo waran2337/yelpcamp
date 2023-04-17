@@ -4,7 +4,6 @@ if (process.env.NODE_ENV !== "production"){
 
 
 
-
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser')
@@ -16,6 +15,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet')
+const MongoStore = require('connect-mongo');
 
 // <------------Requiring ERROR Functions Paths ---------------->
 const ExpressError = require('./utils/ExpressError')
@@ -44,9 +44,24 @@ app.use(mongoSanitize({
 }))
 
 // <------------Using Session ---------------->
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+
+const store = new MongoStore({
+    mongoUrl: dbUrl,  // 'mongodb://127.0.0.1:27017/yelp-camp'
+    touchAfter: 24 * 3600 , // 24 hr
+    crypto: {
+        secret   // before deploying---> secret: 'thisshouldbeabettersecret!'
+    }
+})
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR" , e)
+})
 const sessionConfig = {
+    store,
     name: "YASE",
-    secret: 'thisshouldbeabettersecret!',
+    secret,  // before deploying---> secret: 'thisshouldbeabettersecret!'
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -121,13 +136,15 @@ app.use((req, res, next) => {
 })
 
 // <------------Mongoose Connection Code ---------------->
+// const dbUrl = process.env.DB_URL;
+
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', true);
 // const { Schema } = mongoose;
 
 main().catch(err => console.log(`HO NO MOGO CONNECTION ERROR ${err} `));
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
+    await mongoose.connect(dbUrl);      //'mongodb://127.0.0.1:27017/yelp-camp'
     console.log("MONGO Connection open!!");
 }
 // <------------------------JOI DATA VALIDATION----------------------------->
@@ -152,7 +169,7 @@ app.use((err, req, res, next) => {
     if(!err.message) err.message = 'Oh No Something Went Wrong!'
     res.status(statusCode).render('error.ejs', { err })
 })
-
+const port = process.env.PORT || 3000;
 app.listen(3000, () => {
     console.log('Serving on port 3000')
 })
